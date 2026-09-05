@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In Loving Memory of Charles Ray Anderson</title>
+  <meta name="description" content="Celebrating the life of Charles Ray Anderson." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero__inner">
+      <img class="hero__portrait" src="images/portrait.jpg" alt="Portrait of Charles Ray Anderson" onerror="this.classList.add('is-missing')" />
+      <p class="hero__eyebrow">In Loving Memory</p>
+      <h1 class="hero__name">Charles Ray Anderson</h1>
+      <p class="hero__dates"><!-- TODO: real dates -->March 12, 1938 &nbsp;&ndash;&nbsp; August 28, 2025</p>
+      <p class="hero__epitaph"><!-- TODO: short line / favorite quote -->&ldquo;A gentle man with a steady hand and an open door.&rdquo;</p>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <a href="#obituary">Obituary</a>
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#memories">Memories</a>
+    <a href="#giving">Flowers &amp; Giving</a>
+  </nav>
+
+  <main>
+
+    <!-- ============ OBITUARY ============ -->
+    <section id="obituary" class="section">
+      <h2 class="section__title">Obituary</h2>
+      <div class="prose">
+        <!-- TODO: Replace the placeholder text below with the real obituary.
+             Paste the content we wrote in the earlier chat here. -->
+        <p>Charles Ray Anderson, of [City, State], passed away peacefully on [date] at the age of [age], surrounded by his family.</p>
+        <p>Born on [birth date] in [birthplace] to [parents' names], Charles grew up [brief early life]. He married [spouse] on [date], and together they built a life rooted in [values / place / family].</p>
+        <p>Charles spent [number] years as a [occupation], where he was known for [qualities]. Outside of work, he loved [hobbies / interests], and could often be found [characteristic activity].</p>
+        <p>He is survived by [survivors]. He was preceded in death by [predeceased].</p>
+        <p>The family wishes to thank [caregivers / hospital / hospice] for their compassionate care.</p>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section id="services" class="section section--alt">
+      <h2 class="section__title">Service Details</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>Visitation</h3>
+          <p class="card__when"><!-- TODO -->Friday, September 5, 2025<br />5:00 &ndash; 8:00 PM</p>
+          <p class="card__where">[Funeral Home Name]<br />[Street Address]<br />[City, State ZIP]</p>
+        </article>
+        <article class="card">
+          <h3>Funeral Service</h3>
+          <p class="card__when"><!-- TODO -->Saturday, September 6, 2025<br />11:00 AM</p>
+          <p class="card__where">[Church / Chapel Name]<br />[Street Address]<br />[City, State ZIP]</p>
+        </article>
+        <article class="card">
+          <h3>Interment</h3>
+          <p class="card__when"><!-- TODO -->Immediately following the service</p>
+          <p class="card__where">[Cemetery Name]<br />[City, State]</p>
+        </article>
+      </div>
+      <p class="section__note">A reception will follow at [location]. All are welcome.</p>
+    </section>
+
+    <!-- ============ GALLERY ============ -->
+    <section id="gallery" class="section">
+      <h2 class="section__title">Gallery</h2>
+      <p class="section__note">A few moments from a long and well-loved life.</p>
+      <div class="gallery">
+        <!-- TODO: drop real photos into images/ and update src + alt.
+             Add or remove figures as needed. -->
+        <figure class="gallery__item"><img src="images/photo-01.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+        <figure class="gallery__item"><img src="images/photo-02.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+        <figure class="gallery__item"><img src="images/photo-03.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+        <figure class="gallery__item"><img src="images/photo-04.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+        <figure class="gallery__item"><img src="images/photo-05.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+        <figure class="gallery__item"><img src="images/photo-06.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
+      </div>
+    </section>
+
+    <!-- ============ MEMORIES ============ -->
+    <section id="memories" class="section section--alt">
+      <h2 class="section__title">Memories &amp; Tributes</h2>
+      <p class="section__note">
+        To share a memory, please email
+        <a href="mailto:[family-email]?subject=A memory of Charles Ray Anderson">[family-email]</a>
+        and we will add it here.
+      </p>
+      <div class="memories">
+        <!-- TODO: real tributes -->
+        <blockquote class="memory">
+          <p>&ldquo;[Memory text goes here.]&rdquo;</p>
+          <cite>&mdash; [Name], [relationship]</cite>
+        </blockquote>
+        <blockquote class="memory">
+          <p>&ldquo;[Memory text goes here.]&rdquo;</p>
+          <cite>&mdash; [Name], [relationship]</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- ============ FLOWERS & GIVING ============ -->
+    <section id="giving" class="section">
+      <h2 class="section__title">Flowers &amp; Giving</h2>
+      <div class="prose prose--center">
+        <p>In lieu of flowers, the family asks that donations be made in Charles&rsquo;s memory to
+          <a href="#"><!-- TODO -->[Charity Name]</a>.</p>
+        <p>Flowers may be sent to [Funeral Home Name] at [address].</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p class="footer__line">Charles Ray Anderson</p>
+    <p class="footer__sub">1938 &ndash; 2025 &nbsp;&bull;&nbsp; Forever in our hearts</p>
+    <p class="footer__fam">With love, the Anderson family</p>
+  </footer>
+
+</body>
+</html>

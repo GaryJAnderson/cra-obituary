@@ -1,0 +1,16 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# Node (only if we add tooling later)
+node_modules/
+dist/
+.cache/
+
+# Local notes not meant for the site
+NOTES.local.md
+/private/
