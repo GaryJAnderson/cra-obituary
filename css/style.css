@@ -77,6 +77,13 @@ img { max-width: 100%; display: block; }
   font-size: clamp(2.5rem, 8vw, 4.25rem);
   letter-spacing: 0.01em;
 }
+.hero__nickname {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--accent-dk);
+  margin: 0.25rem 0 0;
+}
 .hero__dates {
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 1.35rem;
