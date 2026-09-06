@@ -1,0 +1,4 @@
+# Pre-launch: keep crawlers away until the site is ready to share.
+# Delete this file (and the noindex meta tag in index.html) at launch.
+User-agent: *
+Disallow: /
