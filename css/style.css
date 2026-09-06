@@ -423,17 +423,17 @@ img { max-width: 100%; display: block; }
   border-radius: 8px;
   padding: 1.25rem 1.35rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
 }
 .mnote__img {
-  /* Consistent padding above; bleeds to the card's side edges; large
-     images are scaled and cropped to a tidy window. Click to enlarge. */
-  width: calc(100% + 2.7rem);
-  max-width: none;
-  margin: 0 -1.35rem 1.15rem;
+  /* Sits inside the card's padding with its own thin border, just like
+     the card. Width is fixed to the column; height follows the photo
+     (a wide photo is simply shorter). Click to enlarge. */
+  width: 100%;
+  height: auto;
+  margin: 0 0 1.2rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
   display: block;
-  object-fit: cover;
-  max-height: 20rem;
   cursor: zoom-in;
 }
 .mnote__body { margin: 0 0 0.9rem; white-space: pre-wrap; }
