@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memories backup — CRA Obituary</title>
+<style>
+  body { font: 15px/1.6 -apple-system, "Segoe UI", sans-serif; margin: 2rem auto; max-width: 60rem; padding: 0 1rem; color: #222; }
+  h1 { font-size: 1.4rem; }
+  .bar { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+  button { font: inherit; padding: .5rem 1.1rem; border: 1px solid #3f5b73; background: #3f5b73; color: #fff; border-radius: 4px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #ddd; padding: .4rem .55rem; text-align: left; vertical-align: top; }
+  th { background: #f4f1ec; }
+  tr.hidden td { color: #999; background: #faf7f2; }
+  .muted { color: #777; }
+  code { background: #f4f1ec; padding: .1rem .3rem; border-radius: 3px; }
+</style>
+</head>
+<body>
+  <h1>Memories backup</h1>
+  <p class="muted">
+    Reads every message in Firestore — including ones that were removed
+    (<code>hidden: true</code>) and their full edit history — and lets you
+    save the lot as a JSON file. Nothing here changes any data.
+  </p>
+
+  <div class="bar">
+    <button id="download" disabled>Download backup.json</button>
+    <span id="summary" class="muted">Loading…</span>
+  </div>
+
+  <table id="tbl">
+    <thead>
+      <tr><th>Posted</th><th>Name</th><th>Relationship</th><th>Message</th><th>Photo</th><th>Status</th><th>Edits</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var cfg = window.CRA_FIREBASE_CONFIG;
+      var summary = document.getElementById("summary");
+      var tbody = document.querySelector("#tbl tbody");
+      var dlBtn = document.getElementById("download");
+
+      if (!cfg || /^YOUR_/.test(cfg.apiKey || "")) {
+        summary.textContent = "firebase-config.js is not filled in yet.";
+        return;
+      }
+
+      firebase.initializeApp(cfg);
+      var db = firebase.firestore();
+      var records = [];
+
+      db.collection("messages").orderBy("createdAt", "asc").get().then(function (snap) {
+        snap.forEach(function (doc) {
+          var d = doc.data();
+          d.id = doc.id;
+          records.push(d);
+          addRow(d);
+        });
+        var hidden = records.filter(function (r) { return r.hidden; }).length;
+        var bytes = new Blob([JSON.stringify(records)]).size;
+        summary.textContent = records.length + " messages (" + hidden + " removed) · " +
+          (bytes / 1024 / 1024).toFixed(2) + " MB";
+        dlBtn.disabled = records.length === 0;
+      }).catch(function (e) {
+        summary.textContent = "Error: " + (e && e.message || e);
+      });
+
+      function addRow(d) {
+        var tr = document.createElement("tr");
+        if (d.hidden) tr.className = "hidden";
+        tr.appendChild(cell(fmt(d.createdAt)));
+        tr.appendChild(cell(d.name || ""));
+        tr.appendChild(cell(d.relationship || ""));
+        tr.appendChild(cell((d.message || "").slice(0, 240)));
+        tr.appendChild(cell(d.image ? "yes" : "—"));
+        tr.appendChild(cell(d.hidden ? "removed" : "visible"));
+        tr.appendChild(cell(String((d.revisions || []).length)));
+        tbody.appendChild(tr);
+      }
+      function cell(text) { var td = document.createElement("td"); td.textContent = text; return td; }
+      function fmt(ms) { var x = new Date(ms || 0); return isNaN(x) ? "" : x.toISOString().slice(0, 16).replace("T", " "); }
+
+      dlBtn.addEventListener("click", function () {
+        var blob = new Blob([JSON.stringify(records, null, 2)], { type: "application/json" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "cra-memories-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+    })();
+  </script>
+</body>
+</html>

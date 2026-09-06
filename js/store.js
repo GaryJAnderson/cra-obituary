@@ -1,69 +1,90 @@
 /* ============================================================
-   store.js — data layer for the Memories guestbook.
+   store.js — data layer for the Memories guestbook (Firebase).
 
-   The rest of the site talks only to window.CRAStore and never
-   needs to know where the data lives. Today that's the browser's
-   own localStorage (works with zero setup, good for previewing).
-   When the Firebase project exists, only this file changes:
-   the same five methods get backed by Firestore + Storage.
+   The rest of the site talks only to window.CRAStore. This file
+   is the only place that knows about Firebase.
 
-   Record shape (identical in both backends):
+   Backend: Cloud Firestore (Spark / free plan, no billing account).
+     - Messages live in the "messages" collection.
+     - Photos are downscaled in the browser and stored inline in
+       the message document as a data URL (Firebase Storage needs a
+       billing account, so we avoid it). Firestore's 1 MiB document
+       limit is why images are compressed hard below.
+     - Each visitor is signed in anonymously (no login screen).
+       A message can only be edited or removed by the same browser
+       that posted it (auth.uid == authorUid).
+     - "Remove" sets hidden = true. Nothing is ever hard-deleted;
+       every prior version is appended to the revisions array.
+
+   Record shape (messages/{autoId}):
      {
-       id, name, relationship, message,
-       image,                // data URL (local) or download URL (firebase), or null
-       createdAt, updatedAt, // ISO strings
-       hidden,               // true == "removed" but KEPT in the backend
+       name, relationship, message,
+       image,        // data URL string, or null
+       authorUid,    // anonymous uid of the poster
+       createdAt,     updatedAt,   // epoch ms (numbers)
+       hidden,       // bool
        revisions: [ { name, relationship, message, image, at, deleted? } ]
      }
-   Nothing is ever hard-deleted: "Remove" sets hidden = true and
-   every prior version is pushed onto revisions.
    ============================================================ */
 (function () {
   "use strict";
 
-  var MESSAGES_KEY = "cra:messages";
-  var TOKENS_KEY = "cra:tokens";
-  var IMAGE_MAX_DIM = 1400;
-  var IMAGE_QUALITY = 0.82;
+  var IMAGE_TRY_DIMS = [1000, 800, 640];
+  var IMAGE_TRY_QUALITIES = [0.72, 0.6, 0.5, 0.42];
+  var IMAGE_MAX_CHARS = 850000; // keeps the whole doc under Firestore's 1 MiB cap
 
-  /* ---------- small helpers ---------- */
+  var NAME_MAX = 80, REL_MAX = 60, MSG_MAX = 4000;
 
-  function uid() {
-    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-    return "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-      var r = (Math.random() * 16) | 0;
-      var v = c === "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
+  var cfg = window.CRA_FIREBASE_CONFIG;
+  var db, auth, ready;
 
-  function readJSON(key, fallback) {
-    try {
-      var raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : fallback;
-    } catch (e) {
-      return fallback;
+  boot();
+
+  function boot() {
+    var unconfigured =
+      !cfg || !cfg.apiKey || /^YOUR_/.test(cfg.apiKey) ||
+      typeof firebase === "undefined";
+    if (unconfigured) {
+      ready = Promise.reject(new Error(
+        "The guestbook isn't connected yet. (Firebase config not set.)"
+      ));
+      // Swallow the unhandled-rejection noise; callers handle it.
+      ready.catch(function () {});
+      return;
     }
+    firebase.initializeApp(cfg);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    ready = new Promise(function (resolve, reject) {
+      auth.onAuthStateChanged(function (user) { if (user) resolve(user); });
+      auth.signInAnonymously().catch(function (e) {
+        reject(new Error(
+          "Couldn't connect to the guestbook. If this keeps happening, " +
+          "make sure Anonymous sign-in is enabled in Firebase Authentication."
+        ));
+      });
+    });
+    ready.catch(function () {});
   }
 
-  function writeJSON(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+  function col() { return db.collection("messages"); }
+  function trim(s, max) { return (s == null ? "" : String(s)).trim().slice(0, max); }
+
+  function friendly(err) {
+    var code = err && err.code ? String(err.code) : "";
+    if (code.indexOf("permission-denied") !== -1) {
+      return new Error("That message can only be changed from the device that posted it.");
+    }
+    if (code.indexOf("unavailable") !== -1 || code.indexOf("network") !== -1) {
+      return new Error("Network problem — please check your connection and try again.");
+    }
+    return err instanceof Error ? err : new Error("Something went wrong. Please try again.");
   }
 
-  function loadTokens() {
-    return readJSON(TOKENS_KEY, {});
-  }
-
-  function rememberToken(id, token) {
-    var t = loadTokens();
-    t[id] = token;
-    writeJSON(TOKENS_KEY, t);
-  }
-
-  /* Downscale + re-encode an uploaded image so it stays small. */
+  /* Downscale + compress an uploaded image until it fits inline. */
   function fileToImage(file) {
     return new Promise(function (resolve, reject) {
-      if (!file) return resolve(null);
+      if (!file || !file.size) return resolve(null);
       if (!/^image\//.test(file.type)) return reject(new Error("That file isn't an image."));
       var reader = new FileReader();
       reader.onerror = function () { reject(new Error("Could not read that image.")); };
@@ -71,19 +92,21 @@
         var img = new Image();
         img.onerror = function () { reject(new Error("Could not open that image.")); };
         img.onload = function () {
-          var w = img.naturalWidth, h = img.naturalHeight;
-          var scale = Math.min(1, IMAGE_MAX_DIM / Math.max(w, h));
-          w = Math.round(w * scale);
-          h = Math.round(h * scale);
-          var canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          try {
-            resolve(canvas.toDataURL("image/jpeg", IMAGE_QUALITY));
-          } catch (e) {
-            reject(new Error("Could not process that image."));
+          for (var di = 0; di < IMAGE_TRY_DIMS.length; di++) {
+            var scale = Math.min(1, IMAGE_TRY_DIMS[di] / Math.max(img.naturalWidth, img.naturalHeight));
+            var w = Math.round(img.naturalWidth * scale);
+            var h = Math.round(img.naturalHeight * scale);
+            var canvas = document.createElement("canvas");
+            canvas.width = w; canvas.height = h;
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+            for (var qi = 0; qi < IMAGE_TRY_QUALITIES.length; qi++) {
+              var url;
+              try { url = canvas.toDataURL("image/jpeg", IMAGE_TRY_QUALITIES[qi]); }
+              catch (e) { return reject(new Error("Could not process that image.")); }
+              if (url.length <= IMAGE_MAX_CHARS) return resolve(url);
+            }
           }
+          reject(new Error("That photo is too large even after resizing — try a smaller crop."));
         };
         img.src = reader.result;
       };
@@ -91,126 +114,114 @@
     });
   }
 
-  function snapshot(rec, extra) {
-    var s = {
-      name: rec.name,
-      relationship: rec.relationship,
-      message: rec.message,
-      image: rec.image,
-      at: new Date().toISOString()
-    };
-    if (extra) for (var k in extra) s[k] = extra[k];
-    return s;
-  }
-
-  function publicView(rec) {
+  function view(doc) {
+    var d = doc.data();
+    var uid = auth.currentUser ? auth.currentUser.uid : null;
     return {
-      id: rec.id,
-      name: rec.name,
-      relationship: rec.relationship,
-      message: rec.message,
-      image: rec.image || null,
-      createdAt: rec.createdAt,
-      updatedAt: rec.updatedAt,
-      edited: rec.updatedAt && rec.updatedAt !== rec.createdAt,
-      mine: !!loadTokens()[rec.id]
+      id: doc.id,
+      name: d.name,
+      relationship: d.relationship || "",
+      message: d.message,
+      image: d.image || null,
+      createdAt: new Date(d.createdAt || 0).toISOString(),
+      updatedAt: d.updatedAt ? new Date(d.updatedAt).toISOString() : null,
+      edited: !!d.updatedAt && d.updatedAt !== d.createdAt,
+      mine: !!uid && d.authorUid === uid
     };
   }
 
-  /* ---------- public API ---------- */
+  function revisionOf(d, extra) {
+    var r = {
+      name: d.name,
+      relationship: d.relationship || "",
+      message: d.message,
+      image: d.image || null,
+      at: Date.now()
+    };
+    if (extra) for (var k in extra) r[k] = extra[k];
+    return r;
+  }
 
   var CRAStore = {
-    backend: "local",
+    backend: "firebase",
 
-    /* Visible messages, newest first. */
     list: function () {
-      var all = readJSON(MESSAGES_KEY, []);
-      var visible = all
-        .filter(function (r) { return !r.hidden; })
-        .sort(function (a, b) { return (b.createdAt || "").localeCompare(a.createdAt || ""); })
-        .map(publicView);
-      return Promise.resolve(visible);
+      return ready
+        .then(function () { return col().orderBy("createdAt", "desc").get(); })
+        .then(function (snap) {
+          var out = [];
+          snap.forEach(function (doc) { if (!doc.data().hidden) out.push(view(doc)); });
+          return out;
+        })
+        .catch(function (e) { throw friendly(e); });
     },
 
     add: function (input) {
-      return fileToImage(input.image).then(function (image) {
-        var now = new Date().toISOString();
-        var rec = {
-          id: uid(),
-          name: (input.name || "").trim(),
-          relationship: (input.relationship || "").trim(),
-          message: (input.message || "").trim(),
-          image: image,
-          createdAt: now,
-          updatedAt: now,
-          hidden: false,
-          revisions: []
-        };
-        var token = uid();
-        var all = readJSON(MESSAGES_KEY, []);
-        all.push(rec);
-        persist(all);
-        rememberToken(rec.id, token);
-        return publicView(rec);
-      });
+      return ready.then(function (user) {
+        return fileToImage(input.image).then(function (image) {
+          var now = Date.now();
+          return col().add({
+            name: trim(input.name, NAME_MAX),
+            relationship: trim(input.relationship, REL_MAX),
+            message: trim(input.message, MSG_MAX),
+            image: image,
+            authorUid: user.uid,
+            createdAt: now,
+            updatedAt: now,
+            hidden: false,
+            revisions: []
+          });
+        });
+      }).catch(function (e) { throw friendly(e); });
     },
 
     update: function (id, changes) {
-      var all = readJSON(MESSAGES_KEY, []);
-      var rec = find(all, id);
-      if (!rec) return Promise.reject(new Error("That message no longer exists."));
-      if (!loadTokens()[id]) return Promise.reject(new Error("This message can only be edited from the device that posted it."));
-
-      var imgStep = changes.image
-        ? fileToImage(changes.image)
-        : Promise.resolve(changes.removeImage ? null : rec.image);
-
-      return imgStep.then(function (image) {
-        rec.revisions.push(snapshot(rec));
-        if (changes.name != null) rec.name = String(changes.name).trim();
-        if (changes.relationship != null) rec.relationship = String(changes.relationship).trim();
-        if (changes.message != null) rec.message = String(changes.message).trim();
-        rec.image = image;
-        rec.updatedAt = new Date().toISOString();
-        persist(all);
-        return publicView(rec);
-      });
+      return ready.then(function () {
+        var ref = col().doc(id);
+        return ref.get().then(function (doc) {
+          if (!doc.exists) throw new Error("That message no longer exists.");
+          var d = doc.data();
+          var revisions = (d.revisions || []).slice();
+          revisions.push(revisionOf(d));
+          return ref.update({
+            name: changes.name != null ? trim(changes.name, NAME_MAX) : d.name,
+            relationship: changes.relationship != null ? trim(changes.relationship, REL_MAX) : (d.relationship || ""),
+            message: changes.message != null ? trim(changes.message, MSG_MAX) : d.message,
+            image: changes.removeImage ? null : (d.image || null),
+            hidden: d.hidden || false,
+            createdAt: d.createdAt,
+            updatedAt: Date.now(),
+            revisions: revisions
+          });
+        });
+      }).catch(function (e) { throw friendly(e); });
     },
 
-    /* Soft delete — hidden from the page, retained in the backend. */
+    // Soft delete — hidden from the page, kept in Firestore.
     remove: function (id) {
-      var all = readJSON(MESSAGES_KEY, []);
-      var rec = find(all, id);
-      if (!rec) return Promise.resolve();
-      if (!loadTokens()[id]) return Promise.reject(new Error("This message can only be removed from the device that posted it."));
-      rec.revisions.push(snapshot(rec, { deleted: true }));
-      rec.hidden = true;
-      rec.updatedAt = new Date().toISOString();
-      persist(all);
-      return Promise.resolve();
+      return ready.then(function () {
+        var ref = col().doc(id);
+        return ref.get().then(function (doc) {
+          if (!doc.exists) return;
+          var d = doc.data();
+          var revisions = (d.revisions || []).slice();
+          revisions.push(revisionOf(d, { deleted: true }));
+          return ref.update({
+            name: d.name,
+            relationship: d.relationship || "",
+            message: d.message,
+            image: d.image || null,
+            hidden: true,
+            createdAt: d.createdAt,
+            updatedAt: Date.now(),
+            revisions: revisions
+          });
+        });
+      }).catch(function (e) { throw friendly(e); });
     },
 
-    /* Does this device hold the edit token for that message? */
-    mine: function (id) {
-      return !!loadTokens()[id];
-    }
+    mine: function () { return false; } // unused; list() payload carries `mine`
   };
-
-  function find(all, id) {
-    for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
-    return null;
-  }
-
-  function persist(all) {
-    try {
-      writeJSON(MESSAGES_KEY, all);
-    } catch (e) {
-      throw new Error(
-        "This device's local storage is full — usually from large photos. " +
-        "The live site (Firebase) won't have this limit."
-      );
-    }
-  }
 
   window.CRAStore = CRAStore;
 })();

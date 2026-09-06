@@ -41,6 +41,9 @@
       messages.forEach(function (m) {
         listEl.appendChild(card(m));
       });
+    }).catch(function (err) {
+      listEl.textContent = "";
+      listEl.appendChild(el("p", "mwall__empty", err.message || "The guestbook is unavailable right now."));
     });
   }
 
