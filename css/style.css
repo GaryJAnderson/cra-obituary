@@ -423,14 +423,18 @@ img { max-width: 100%; display: block; }
   border-radius: 8px;
   padding: 1.25rem 1.35rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 .mnote__img {
+  /* Consistent padding above; bleeds to the card's side edges; large
+     images are scaled and cropped to a tidy window. Click to enlarge. */
   width: calc(100% + 2.7rem);
-  margin: -1.25rem -1.35rem 1rem;
-  border-radius: 8px 8px 0 0;
+  max-width: none;
+  margin: 0 -1.35rem 1.15rem;
   display: block;
   object-fit: cover;
-  max-height: 22rem;
+  max-height: 20rem;
+  cursor: zoom-in;
 }
 .mnote__body { margin: 0 0 0.9rem; white-space: pre-wrap; }
 .mnote__meta {
@@ -438,7 +442,7 @@ img { max-width: 100%; display: block; }
   color: var(--ink-soft);
 }
 .mnote__name { font-weight: 600; color: var(--ink); }
-.mnote__rel::before { content: " \00b7 "; }
+.mnote__rel::before { content: "\00b7"; margin: 0 0.5em; }
 .mnote__date { display: block; font-size: 0.8rem; margin-top: 0.15rem; opacity: 0.8; }
 .mnote__actions {
   display: flex;
@@ -461,6 +465,59 @@ img { max-width: 100%; display: block; }
   padding: 0.5rem 0.6rem;
 }
 .mnote__edit textarea { resize: vertical; min-height: 5rem; }
+
+/* ---------- Lightbox for memory photos ---------- */
+body.has-lightbox { overflow: hidden; }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  background: rgba(24, 18, 13, 0.86);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  cursor: zoom-out;
+  animation: lightbox-in 0.16s ease-out;
+}
+@keyframes lightbox-in { from { opacity: 0; } to { opacity: 1; } }
+.lightbox__img {
+  max-width: min(100%, 58rem);
+  max-height: 68vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.lightbox__caption {
+  max-width: 40rem;
+  color: #f2ece2;
+  text-align: center;
+  cursor: auto;
+}
+.lightbox__caption p { margin: 0 0 0.6rem; white-space: pre-wrap; }
+.lightbox__meta { font-size: 0.9rem; color: #c9bfae; }
+.lightbox__close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox__close:hover { background: rgba(255, 255, 255, 0.26); }
+@media (prefers-reduced-motion: reduce) {
+  .lightbox { animation: none; }
+}
 
 /* ---------- Footer: sinking into grainy soil ---------- */
 .footer {

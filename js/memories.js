@@ -114,6 +114,9 @@
   /* ---------- edit / remove ---------- */
 
   function onListClick(e) {
+    var imgEl = e.target.closest(".mnote__img");
+    if (imgEl) return openLightbox(imgEl);
+
     var actionBtn = e.target.closest("[data-act]");
     if (!actionBtn) return;
     var art = e.target.closest(".mnote");
@@ -198,6 +201,53 @@
         render();
       })
       .catch(function (err) { setStatus(err.message, true); });
+  }
+
+  /* ---------- lightbox ---------- */
+
+  function openLightbox(imgEl) {
+    var card = imgEl.closest(".mnote");
+    var overlay = el("div", "lightbox");
+
+    var close = el("button", "lightbox__close", "×");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close");
+
+    var big = document.createElement("img");
+    big.className = "lightbox__img";
+    big.src = imgEl.src;
+    big.alt = imgEl.alt || "";
+
+    var cap = el("div", "lightbox__caption");
+    var body = card && card.querySelector(".mnote__body");
+    if (body && body.textContent) cap.appendChild(el("p", null, body.textContent));
+
+    var name = card && card.querySelector(".mnote__name");
+    var rel = card && card.querySelector(".mnote__rel");
+    var date = card && card.querySelector(".mnote__date");
+    var parts = [];
+    if (name && name.textContent) parts.push(name.textContent);
+    if (rel && rel.textContent) parts.push(rel.textContent);
+    if (date && date.textContent) parts.push(date.textContent);
+    if (parts.length) cap.appendChild(el("p", "lightbox__meta", parts.join("  ·  ")));
+
+    overlay.appendChild(close);
+    overlay.appendChild(big);
+    overlay.appendChild(cap);
+    document.body.appendChild(overlay);
+    document.body.classList.add("has-lightbox");
+
+    function dismiss() {
+      overlay.remove();
+      document.body.classList.remove("has-lightbox");
+      document.removeEventListener("keydown", onKey);
+    }
+    function onKey(ev) { if (ev.key === "Escape") dismiss(); }
+
+    overlay.addEventListener("click", function (ev) {
+      if (ev.target === overlay || ev.target === close || ev.target === big) dismiss();
+    });
+    document.addEventListener("keydown", onKey);
   }
 
   /* ---------- tiny DOM helpers ---------- */
