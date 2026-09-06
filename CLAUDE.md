@@ -56,6 +56,27 @@ Pending:
   full edit history).
 - **Moderate:** hide spam by setting `hidden: true` on the doc in the console.
 
+## Security posture
+
+- **The `apiKey` in `js/firebase-config.js` is public by design.** GitHub secret
+  scanning flags it; that alert is a pattern match, not a breach. Never revoke or
+  rotate it — that breaks the site and a replacement would be equally public.
+  Harden it by *restricting* it in Google Cloud Console (website + API
+  restrictions). See the comment at the top of that file.
+- **Firestore rules are the actual access control**, and they were verified live
+  (2026-09-06): an over-length message write was rejected server-side with
+  `permission-denied`. Rules: public read; create requires anonymous auth with
+  strict field validation; edit only from the posting device; hard delete
+  disabled; edit history append-only.
+- **No billing account** is attached (Spark plan), so abuse cannot cost money —
+  worst case is exhausting a free daily quota.
+- `_headers` sets a strict CSP (no inline scripts) plus HSTS, nosniff,
+  frame-ancestors none, and a locked-down Permissions-Policy. **Any new
+  third-party origin must be added there or the browser will block it.**
+- Known accepted gap: **no rate limiting** on the guestbook. Scripted spam is
+  possible. The fix if it ever happens is Firebase **App Check**; junk is
+  removable from the Firebase console.
+
 ## Local dev
 
 No Node or Python on this machine — a local static server can't be run here.

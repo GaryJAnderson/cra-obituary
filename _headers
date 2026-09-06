@@ -1,0 +1,24 @@
+# Netlify security headers.
+#
+# The Content-Security-Policy is deliberately tight: no inline scripts, and
+# every external origin the site actually talks to is listed explicitly.
+# If you add a new third-party (analytics, a font, an embed), it MUST be
+# added here or the browser will silently block it.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com; frame-src https://www.youtube-nocookie.com https://cra-obituary.firebaseapp.com; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+
+# The backup tool is a local-use utility with its own inline style/script,
+# so it gets a slightly looser policy. It only reads data that is already
+# publicly readable, but keep it out of search results.
+/tools/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com; base-uri 'none'; object-src 'none'; frame-ancestors 'none'
+  X-Robots-Tag: noindex, nofollow
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff

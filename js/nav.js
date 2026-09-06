@@ -48,9 +48,25 @@
     sections.forEach(function (s) { spy.observe(s); });
   }
 
+  /* Portrait fallback. Lives here rather than as an inline onerror=
+     attribute so the page can run under a strict Content-Security-Policy
+     that forbids inline scripts. */
+  function portraitFallback() {
+    var portrait = document.querySelector(".hero__portrait");
+    if (!portrait) return;
+    portrait.addEventListener("error", function () {
+      portrait.classList.add("is-missing");
+    });
+    if (portrait.complete && portrait.naturalWidth === 0) {
+      portrait.classList.add("is-missing");
+    }
+  }
+
+  function start() { init(); portraitFallback(); }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", start);
   } else {
-    init();
+    start();
   }
 })();
