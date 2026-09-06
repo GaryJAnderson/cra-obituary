@@ -25,17 +25,43 @@
   </header>
 
   <nav class="nav">
+    <a href="#in-memory">In Memory</a>
     <a href="#obituary">Obituary</a>
-    <a href="#services">Services</a>
-    <a href="#gallery">Gallery</a>
     <a href="#memories">Memories</a>
-    <a href="#giving">Flowers &amp; Giving</a>
+    <a href="#contact">Contact</a>
   </nav>
 
   <main>
 
+    <!-- ============ IN MEMORY (VIDEO) ============ -->
+    <section id="in-memory" class="section">
+      <h2 class="section__title">In Memory</h2>
+      <p class="section__note">A short film celebrating Chuck&rsquo;s life.</p>
+
+      <!-- When the video is on YouTube (set to Unlisted), replace this
+           placeholder block with the iframe below and set VIDEO_ID:
+
+      <div class="video">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/VIDEO_ID?rel=0"
+          title="In memory of Charles Ray &ldquo;Chuck&rdquo; Anderson"
+          loading="lazy"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+      -->
+
+      <div class="video video--placeholder" role="img" aria-label="Memorial video coming soon">
+        <div class="video__ph">
+          <svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          <p class="video__ph-title">Video coming soon</p>
+          <p class="video__ph-sub">A memorial video will play here.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ OBITUARY ============ -->
-    <section id="obituary" class="section">
+    <section id="obituary" class="section section--alt">
       <h2 class="section__title">Obituary</h2>
       <div class="prose">
         <p>Early in the morning on February 28, 2026, Charles Ray Anderson (better known as &ldquo;Chuck&rdquo; to his family and friends) passed away at Elkhorn Healthcare and Rehabilitation in Clancy, MT after a two&#8209;year struggle with mesothelioma. He was 84 years old.</p>
@@ -56,73 +82,46 @@
       </div>
     </section>
 
-    <!-- ============ SERVICES ============ -->
-    <section id="services" class="section section--alt">
-      <h2 class="section__title">Service Details</h2>
-      <div class="cards">
-        <article class="card">
-          <h3>Visitation</h3>
-          <p class="card__when"><!-- TODO -->Friday, September 5, 2025<br />5:00 &ndash; 8:00 PM</p>
-          <p class="card__where">[Funeral Home Name]<br />[Street Address]<br />[City, State ZIP]</p>
-        </article>
-        <article class="card">
-          <h3>Funeral Service</h3>
-          <p class="card__when"><!-- TODO -->Saturday, September 6, 2025<br />11:00 AM</p>
-          <p class="card__where">[Church / Chapel Name]<br />[Street Address]<br />[City, State ZIP]</p>
-        </article>
-        <article class="card">
-          <h3>Interment</h3>
-          <p class="card__when"><!-- TODO -->Immediately following the service</p>
-          <p class="card__where">[Cemetery Name]<br />[City, State]</p>
-        </article>
-      </div>
-      <p class="section__note">A reception will follow at [location]. All are welcome.</p>
+    <!-- ============ MEMORIES (GUESTBOOK) ============ -->
+    <section id="memories" class="section">
+      <h2 class="section__title">Memories</h2>
+      <p class="section__note">Share a memory of Chuck &mdash; a story, a photo, a few words. Your message stays here for the family to keep.</p>
+
+      <form id="memory-form" class="mform" novalidate>
+        <div class="mform__grid">
+          <label class="field">
+            <span class="field__label">Your name <em>*</em></span>
+            <input type="text" name="name" required maxlength="80" autocomplete="name" />
+          </label>
+          <label class="field">
+            <span class="field__label">Relationship <span class="field__opt">(optional)</span></span>
+            <input type="text" name="relationship" maxlength="60" placeholder="friend, nephew, coworker&hellip;" />
+          </label>
+        </div>
+        <label class="field">
+          <span class="field__label">Your message <em>*</em></span>
+          <textarea name="message" required rows="4" maxlength="4000"></textarea>
+        </label>
+        <label class="field">
+          <span class="field__label">Add a photo <span class="field__opt">(optional)</span></span>
+          <input type="file" name="image" accept="image/*" />
+        </label>
+        <div class="mform__actions">
+          <button type="submit" class="btn">Post memory</button>
+          <span id="memory-status" class="mform__hint" role="status">You can edit or remove your message afterward from this device.</span>
+        </div>
+      </form>
+
+      <div id="memory-list" class="mwall" aria-live="polite"></div>
     </section>
 
-    <!-- ============ GALLERY ============ -->
-    <section id="gallery" class="section">
-      <h2 class="section__title">Gallery</h2>
-      <p class="section__note">A few moments from a long and well-loved life.</p>
-      <div class="gallery">
-        <!-- TODO: drop real photos into images/ and update src + alt.
-             Add or remove figures as needed. -->
-        <figure class="gallery__item"><img src="images/photo-01.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-        <figure class="gallery__item"><img src="images/photo-02.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-        <figure class="gallery__item"><img src="images/photo-03.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-        <figure class="gallery__item"><img src="images/photo-04.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-        <figure class="gallery__item"><img src="images/photo-05.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-        <figure class="gallery__item"><img src="images/photo-06.jpg" alt="" onerror="this.closest('figure').classList.add('is-missing')" /></figure>
-      </div>
-    </section>
-
-    <!-- ============ MEMORIES ============ -->
-    <section id="memories" class="section section--alt">
-      <h2 class="section__title">Memories &amp; Tributes</h2>
-      <p class="section__note">
-        To share a memory, please email
-        <a href="mailto:[family-email]?subject=A memory of Charles Ray Anderson">[family-email]</a>
-        and we will add it here.
-      </p>
-      <div class="memories">
-        <!-- TODO: real tributes -->
-        <blockquote class="memory">
-          <p>&ldquo;[Memory text goes here.]&rdquo;</p>
-          <cite>&mdash; [Name], [relationship]</cite>
-        </blockquote>
-        <blockquote class="memory">
-          <p>&ldquo;[Memory text goes here.]&rdquo;</p>
-          <cite>&mdash; [Name], [relationship]</cite>
-        </blockquote>
-      </div>
-    </section>
-
-    <!-- ============ FLOWERS & GIVING ============ -->
-    <section id="giving" class="section">
-      <h2 class="section__title">Flowers &amp; Giving</h2>
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="section section--alt">
+      <h2 class="section__title">Contact</h2>
       <div class="prose prose--center">
-        <p>In lieu of flowers, the family asks that donations be made in Charles&rsquo;s memory to
-          <a href="#"><!-- TODO -->[Charity Name]</a>.</p>
-        <p>Flowers may be sent to [Funeral Home Name] at [address].</p>
+        <p>For questions about arrangements, or just to reach the family, contact Chuck&rsquo;s son <strong>Tony Anderson</strong>.</p>
+        <!-- TODO: set Tony's Facebook profile URL -->
+        <p><a class="btn btn--fb" href="TONY_FACEBOOK_URL" target="_blank" rel="noopener noreferrer">Message Tony on Facebook</a></p>
       </div>
     </section>
 
@@ -134,5 +133,9 @@
     <p class="footer__fam">With love, the Anderson family</p>
   </footer>
 
+  <!-- Memories guestbook: data layer + UI. Plain scripts (no modules) so
+       the page also works when opened directly from disk. -->
+  <script src="js/store.js"></script>
+  <script src="js/memories.js"></script>
 </body>
 </html>
