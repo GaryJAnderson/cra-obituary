@@ -79,16 +79,17 @@ body {
   top: 0;
   left: -20%;
   width: 140%;
-  height: min(80vh, 700px);
+  height: min(92vh, 820px);
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(30% 34% at 13% 24%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.34) 45%, transparent 72%),
-    radial-gradient(25% 30% at 31% 41%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.24) 46%, transparent 73%),
-    radial-gradient(34% 36% at 57% 19%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.30) 45%, transparent 72%),
-    radial-gradient(24% 27% at 74% 39%, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.22) 48%, transparent 74%),
-    radial-gradient(33% 35% at 90% 21%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.28) 45%, transparent 72%);
-  filter: blur(11px);
+    radial-gradient(36% 30% at 12% 22%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.45) 46%, transparent 74%),
+    radial-gradient(30% 26% at 30% 38%, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.34) 48%, transparent 75%),
+    radial-gradient(40% 32% at 56% 16%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.40) 46%, transparent 74%),
+    radial-gradient(28% 24% at 73% 36%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.30) 50%, transparent 76%),
+    radial-gradient(38% 30% at 91% 20%, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.38) 46%, transparent 74%),
+    radial-gradient(30% 22% at 44% 52%, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.20) 50%, transparent 78%);
+  filter: blur(9px);
   animation: cloud-drift 90s ease-in-out infinite alternate;
 }
 @keyframes cloud-drift {
@@ -111,12 +112,12 @@ img { max-width: 100%; display: block; }
 /* ---------- Hero ---------- */
 .hero {
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(250, 248, 244, 0.60) 78%,
+    transparent 0%,
+    transparent 34%,
+    rgba(250, 248, 244, 0.34) 60%,
+    rgba(250, 248, 244, 0.70) 85%,
     var(--panel) 100%);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   padding: clamp(3rem, 9vw, 6rem) var(--pad);
   text-align: center;
 }
@@ -124,7 +125,7 @@ img { max-width: 100%; display: block; }
 .hero__eyebrow,
 .hero__name,
 .hero__dates {
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85), 0 0 18px rgba(255, 255, 255, 0.6);
 }
 
 .hero__portrait {
@@ -145,9 +146,9 @@ img { max-width: 100%; display: block; }
 .hero__eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.28em;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #34322f;
   margin: 0 0 0.75rem;
 }
 .hero__name {
@@ -172,8 +173,9 @@ img { max-width: 100%; display: block; }
 }
 .hero__dates {
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 1.35rem;
-  color: var(--ink-soft);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3a3630;
   margin: 0.5rem 0 0;
 }
 
@@ -249,8 +251,13 @@ img { max-width: 100%; display: block; }
   margin-inline: auto;
 }
 #contact {
-  padding-block: clamp(1.75rem, 4vw, 2.5rem);
+  padding-block: clamp(1.5rem, 3.5vw, 2.25rem) clamp(7rem, 13vw, 10rem);
   border-bottom: none;
+  /* Partly see-through so the rising soil below eases in through it */
+  background: linear-gradient(180deg,
+    var(--panel-alt) 0%,
+    rgba(243, 238, 230, 0.45) 55%,
+    rgba(243, 238, 230, 0.12) 100%);
 }
 .section__title {
   font-size: clamp(1.9rem, 5vw, 2.75rem);
@@ -459,52 +466,50 @@ img { max-width: 100%; display: block; }
 .footer {
   position: relative;
   isolation: isolate;
-  margin-top: -2rem;
-  padding: 5rem var(--pad) 3.75rem;
+  margin-top: -3rem;
+  padding: 4.5rem var(--pad) 4rem;
   text-align: center;
   color: #fff;
-  background:
-    /* pale flecks — tiny stones / pockets of light */
-    radial-gradient(2px 2px at 18% 42%, rgba(228, 216, 198, 0.55), transparent 60%),
-    radial-gradient(3px 2px at 62% 30%, rgba(224, 210, 190, 0.50), transparent 60%),
-    radial-gradient(2px 2px at 83% 57%, rgba(232, 222, 206, 0.45), transparent 60%),
-    radial-gradient(2px 3px at 38% 66%, rgba(222, 208, 188, 0.45), transparent 60%),
-    radial-gradient(2px 2px at 8% 72%,  rgba(226, 214, 196, 0.40), transparent 60%),
-    /* the soil: clear at the very top, then deep warm brown */
-    linear-gradient(180deg,
-      rgba(74, 52, 37, 0) 0%,
-      rgba(74, 52, 37, 0.65) 10%,
-      #4a3427 26%,
-      #3b2a1d 52%,
-      #2c1f15 78%,
-      #241a12 100%);
+  background: linear-gradient(180deg, #33251a 0%, #2a1e14 45%, #201710 100%);
 }
-/* coarse, blurred mottling — soil clods, out of focus */
+/* Rising soil: warm brown + blurred mottle. Extends up into the
+   Contacts section and fades out toward the top. */
 .footer::before {
   content: "";
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: -10rem;
   z-index: -1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.016' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-  background-size: 460px 460px;
-  opacity: 0.55;
-  mix-blend-mode: soft-light;
-  filter: blur(5px) contrast(1.15);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 16%);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg,
+      rgba(74, 52, 37, 0) 0%,
+      rgba(66, 47, 33, 0.5) 40%,
+      rgba(52, 38, 27, 0.92) 68%,
+      #34261b 100%);
+  background-size: 480px 480px, 100% 100%;
+  background-blend-mode: soft-light;
+  filter: blur(4px) contrast(1.08);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 48%, #000 80%);
+          mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 48%, #000 80%);
   pointer-events: none;
 }
-/* fine grain speckle over everything */
+/* Fine grain: strongest at the very bottom, gone by the top. */
 .footer::after {
   content: "";
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: -6rem;
   z-index: -1;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  opacity: 0.20;
+  opacity: 0.32;
   mix-blend-mode: overlay;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 12%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.18) 50%, #000 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.18) 50%, #000 100%);
   pointer-events: none;
 }
 .footer > * { position: relative; z-index: 1; }
