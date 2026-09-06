@@ -29,9 +29,9 @@ Pending:
   commented-out `<iframe>` and set the video id.
 - At launch: delete `robots.txt` and remove the `<meta name="robots"
   content="noindex, nofollow">` line from `index.html`.
-- A **"TEST" guestbook card** with a photo may still be live — remove it via the
-  page's own Remove button (from the browser that posted it) or the Firebase
-  console.
+- Two guestbook messages are soft-deleted (`hidden: true`) from testing — they
+  are retained in Firestore by design and invisible on the page. Hard-delete
+  them from the Firebase console if you want the collection tidy.
 
 ## How it works
 
@@ -60,9 +60,13 @@ Pending:
 
 - **The `apiKey` in `js/firebase-config.js` is public by design.** GitHub secret
   scanning flags it; that alert is a pattern match, not a breach. Never revoke or
-  rotate it — that breaks the site and a replacement would be equally public.
-  Harden it by *restricting* it in Google Cloud Console (website + API
-  restrictions). See the comment at the top of that file.
+  rotate it — that breaks the site, and a replacement would be equally public.
+  **Restricted and verified 2026-09-06:** locked in Google Cloud Console to
+  `cra-obituary.netlify.app/*` and to four APIs (Identity Toolkit, Token Service,
+  Cloud Firestore, Firebase Installations). Calls with no referrer or a foreign
+  referrer now return `API_KEY_HTTP_REFERRER_BLOCKED`. The referrer header *can*
+  be spoofed outside a browser, so this is a speed bump — the Firestore rules
+  remain the real boundary. GitHub alert closed as "Won't fix".
 - **Firestore rules are the actual access control**, and they were verified live
   (2026-09-06): an over-length message write was rejected server-side with
   `permission-denied`. Rules: public read; create requires anonymous auth with
