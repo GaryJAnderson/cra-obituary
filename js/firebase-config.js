@@ -1,18 +1,18 @@
 /* ============================================================
    firebase-config.js
 
-   Paste the config object from the Firebase console here
-   (Project settings -> Your apps -> Web app -> "SDK setup").
+   Config for the "CRA-Obituary" Firebase project, from
+   Firebase console -> Project settings -> General -> Your apps.
 
    These values are NOT secret — they ship in the page on purpose.
-   Access is controlled by the Firestore security rules, not by
-   hiding this config.
+   Access is controlled by the Firestore security rules
+   (see firestore.rules), not by hiding this config.
    ============================================================ */
 window.CRA_FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyA84lJlhbFU4Z_bbQctKUrwqeEIFFekxYI",
   authDomain: "cra-obituary.firebaseapp.com",
   projectId: "cra-obituary",
-  storageBucket: "cra-obituary.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  storageBucket: "cra-obituary.firebasestorage.app",
+  messagingSenderId: "667444559905",
+  appId: "1:667444559905:web:be8b59ffbe15bd4fd22360"
 };
