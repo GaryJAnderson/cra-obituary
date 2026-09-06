@@ -14,20 +14,81 @@
   --danger:    #9b5442;
   --max:       68rem;
   --pad:       clamp(1.25rem, 5vw, 3rem);
+
+  /* Sky -> trees -> earth: the page's vertical journey */
+  --sky:    #aecadd;
+  --sky-2:  #bcd0d6;
+  --haze:   #bfcdbb;
+  --canopy: #a4b89b;
+  --moss:   #b3b592;
+  --sand:   #cebfa3;
+  --earth:  #d8c8ab;
+
+  /* Frosted content panels that float over the journey */
+  --panel:     rgba(250, 248, 244, 0.82);
+  --panel-alt: rgba(243, 238, 230, 0.78);
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  background: var(--sky);
+}
 
 body {
   margin: 0;
-  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
   color: var(--ink);
   font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 400;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+
+  /* Soft, blurred blobs down the page — clouds up top, a hint of
+     canopy through the middle, pools of light in the soil below —
+     over a calm blue-to-green-to-earth gradient. */
+  background-color: var(--haze);
+  background-image:
+    radial-gradient(38% 15% at 22% 5%,  rgba(255, 255, 255, 0.60), transparent 72%),
+    radial-gradient(30% 12% at 68% 9%,  rgba(255, 255, 255, 0.50), transparent 72%),
+    radial-gradient(26% 10% at 46% 14%, rgba(255, 255, 255, 0.42), transparent 72%),
+    radial-gradient(58% 16% at 10% 45%, rgba(122, 152, 114, 0.28), transparent 75%),
+    radial-gradient(58% 18% at 90% 56%, rgba(110, 140, 104, 0.26), transparent 75%),
+    radial-gradient(46% 13% at 28% 85%, rgba(245, 235, 216, 0.55), transparent 75%),
+    radial-gradient(42% 13% at 72% 92%, rgba(238, 227, 203, 0.50), transparent 75%),
+    linear-gradient(180deg,
+      var(--sky)    0%,
+      var(--sky-2)  17%,
+      var(--haze)   38%,
+      var(--canopy) 55%,
+      var(--moss)   71%,
+      var(--sand)   86%,
+      var(--earth) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* Clouds that drift slowly, pinned to the top of the page. */
+.drift {
+  position: absolute;
+  top: 0;
+  left: -20%;
+  width: 140%;
+  height: min(72vh, 640px);
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(26% 40% at 18% 34%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(22% 32% at 52% 46%, rgba(255, 255, 255, 0.42), transparent 70%),
+    radial-gradient(30% 42% at 82% 28%, rgba(255, 255, 255, 0.48), transparent 70%);
+  filter: blur(16px);
+  animation: cloud-drift 90s ease-in-out infinite alternate;
+}
+@keyframes cloud-drift {
+  from { transform: translate3d(-3%, 0, 0); }
+  to   { transform: translate3d(3%, 1.5%, 0); }
 }
 
 h1, h2, h3 {
@@ -44,12 +105,22 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Hero ---------- */
 .hero {
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(250, 248, 244, 0.60) 78%,
+    var(--panel) 100%);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   padding: clamp(3rem, 9vw, 6rem) var(--pad);
   text-align: center;
 }
 .hero__inner { max-width: 40rem; margin: 0 auto; }
+.hero__eyebrow,
+.hero__name,
+.hero__dates {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.55);
+}
 
 .hero__portrait {
   width: 190px;
@@ -95,9 +166,10 @@ img { max-width: 100%; display: block; }
   justify-content: center;
   gap: clamp(0.75rem, 4vw, 2.5rem);
   padding: 0.9rem var(--pad);
-  background: rgba(250, 248, 245, 0.92);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--rule);
+  background: rgba(249, 247, 243, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 }
 .nav a {
   text-decoration: none;
@@ -112,13 +184,22 @@ img { max-width: 100%; display: block; }
 /* ---------- Sections ---------- */
 .section {
   max-width: var(--max);
-  margin: 0 auto;
+  margin-block: clamp(0.75rem, 3.5vw, 2.25rem);
+  margin-inline: auto;
   padding: clamp(3rem, 8vw, 5.5rem) var(--pad);
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(7px) saturate(1.05);
+  backdrop-filter: blur(7px) saturate(1.05);
+  border-radius: 12px;
+  box-shadow: 0 6px 34px rgba(70, 78, 86, 0.08);
 }
 .section--alt {
   max-width: none;
-  background: var(--bg-alt);
-  border-block: 1px solid var(--rule);
+  margin-block: clamp(0.75rem, 3.5vw, 2.25rem);
+  background: var(--panel-alt);
+  border-radius: 0;
+  box-shadow: none;
+  border-block: 1px solid rgba(255, 255, 255, 0.45);
 }
 .section--alt > * {
   max-width: var(--max);
@@ -195,8 +276,8 @@ img { max-width: 100%; display: block; }
   border: 0;
 }
 .video--placeholder {
-  background: var(--bg-alt);
-  border: 1px dashed var(--rule);
+  background: rgba(250, 248, 244, 0.55);
+  border: 1px dashed rgba(120, 118, 108, 0.35);
   box-shadow: none;
   display: grid;
   place-items: center;
@@ -215,7 +296,7 @@ img { max-width: 100%; display: block; }
 .mform {
   max-width: 42rem;
   margin: 0 auto 3.5rem;
-  background: var(--bg-alt);
+  background: rgba(250, 248, 244, 0.92);
   border: 1px solid var(--rule);
   border-radius: 8px;
   padding: clamp(1.5rem, 4vw, 2.25rem);
@@ -281,7 +362,7 @@ img { max-width: 100%; display: block; }
 .mnote {
   break-inside: avoid;
   margin: 0 0 1.25rem;
-  background: var(--bg);
+  background: rgba(252, 251, 248, 0.94);
   border: 1px solid var(--rule);
   border-radius: 8px;
   padding: 1.25rem 1.35rem;
@@ -325,24 +406,26 @@ img { max-width: 100%; display: block; }
 }
 .mnote__edit textarea { resize: vertical; min-height: 5rem; }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer (settles into the earth) ---------- */
 .footer {
-  background: var(--ink);
-  color: #d8d2c7;
+  background: linear-gradient(180deg, rgba(206, 191, 163, 0.55), var(--earth));
+  color: #574b3d;
   text-align: center;
   padding: 3.5rem var(--pad);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 .footer__line {
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 1.75rem;
   margin: 0 0 0.35rem;
-  color: #fff;
+  color: #3b3229;
 }
-.footer__sub { margin: 0 0 1.25rem; font-size: 0.9rem; letter-spacing: 0.05em; }
-.footer__fam { margin: 0; font-style: italic; color: #a9a196; }
+.footer__sub { margin: 0 0 1.25rem; font-size: 0.9rem; letter-spacing: 0.05em; color: #6a5e4e; }
+.footer__fam { margin: 0; font-style: italic; color: #7b6f5f; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
+  .drift { animation: none !important; }
 }
